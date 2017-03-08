@@ -1,15 +1,24 @@
+pragma solidity ^0.4.8;
+
+
 contract Madness {
   address owner;
   uint COST = 100000000000000000; // 0.1 ETH
   uint STOP_TIME = 1489012283; // Time the tournament starts
+  uint FINAL_TIME = 1489012283; // 48 hours after the tournament ends
+  bool ABORTED = false;
 
   // The bracket is comprised of a bunch of integer slots.
   // The integer supplied indicates the seed number of the predicted winner.
   // Within each bracket, games are defined starting from the round of 64 and going down.
   struct bracket {
     // There are four quarter brackets (East, West, North, South) in a fullBracket
-    // Indices: 0=South, 1=West, 2=East, 3=Midwest
-    uint8[4][15] quarterBracket;
+    uint8[15] south;
+    uint8[15] west;
+    uint8[15] east;
+    uint8[15] midwest;
+
+    // Index is 0=South, 1=West, 2=East, 3=Midwest
     uint8[4] quarterBracketScore;
     // The final four is 2 games (South-West and North-East)
     // The first dimension is the game, the second dimension is [region, seed]
@@ -50,11 +59,11 @@ contract Madness {
    * Begin a bracket as a user (before the expiration time).
    * The cost is 0.1 Ether.
    */
-  function startBracket() public returns (bool) {
+  function startBracket() payable public returns (bool) {
     if (now > STOP_TIME) { return false; }
     if (!userBrackets[msg.sender].started) {
       if (msg.value < COST) { return false; }
-      if (msg.value > COST) { msg.sender.send(COST - msg.value); }
+      if (msg.value > COST) { if (!msg.sender.send(COST - msg.value)) { throw; } }
       pool += COST;
       userBrackets[msg.sender].started = true;
     }
@@ -63,24 +72,30 @@ contract Madness {
 
   /**
    * Update a quarterBracket as a user
-   * @param {uint8} region - 1=South, 2=West, 3=East, 4=Midwest
-   * @param {uint8[15]} games - winning seed (1-16) for each game, starting at the top
+   * param {uint8} region - 1=South, 2=West, 3=East, 4=Midwest
+   * param {uint8[15]} games - winning seed (1-16) for each game, starting at the top
    */
   function setQuarterBracket(uint8 region, uint8[15] games) public returns (bool) {
     if (msg.sender == owner) {
-      oracleBracket.quarterBracket[region-1] = games;
+      if (region == 1) { oracleBracket.south = games; }
+      else if (region == 2) { oracleBracket.west = games; }
+      else if (region == 3) { oracleBracket.east = games; }
+      else if (region == 4) { oracleBracket.midwest = games; }
     } else {
-      userBrackets[msg.sender].quarterBracket[region-1] = games;
+      if (region == 1) { userBrackets[msg.sender].south = games; }
+      else if (region == 2) { userBrackets[msg.sender].west = games; }
+      else if (region == 3) { userBrackets[msg.sender].east = games; }
+      else if (region == 4) { userBrackets[msg.sender].midwest = games; }
     }
     return true;
   }
 
   /**
    * Update the finalFour and championship predictions.
-   * @param {uint[4]} finalFour - [finalFour[0][0], finalFour[0][1], finalFour[1][0], finalFour[1][1]
-   * @param {uint[2]} championship - [region, seed]
+   * param uint[4] finalFour - [finalFour[0][0], finalFour[0][1], finalFour[1][0], finalFour[1][1]
+   * param uint[2] championship - [region, seed]
    */
-  function setFinals(uint[4] finalFour, uint[2] championship) public returns (bool) {
+  function setFinals(uint8[4] finalFour, uint8[2] championship) public returns (bool) {
     if (msg.sender == owner) {
       oracleBracket.finalFour[0] = [finalFour[0], finalFour[1]];
       oracleBracket.finalFour[1] = [finalFour[2], finalFour[3]];
@@ -93,17 +108,23 @@ contract Madness {
     return true;
   }
 
-
   /**
    * Score a particular quarter bracket for the message sender.
    * Bracket must be stared.
-   * @param  {uint8} region - 1=South, 2=West, 3=East, 4=Midwest
+   * param  uint8 region - 1=South, 2=West, 3=East, 4=Midwest
    */
   function scoreQuarterBracket(uint8 region) public returns (bool) {
     if (!userBrackets[msg.sender].started) { return false; }
+    uint8[15] memory user;
+    uint8[15] memory oracle;
+    if (region == 1) { user = userBrackets[msg.sender].south; oracle = oracleBracket.south; }
+    else if (region == 2) { user = userBrackets[msg.sender].west; oracle = oracleBracket.west; }
+    else if (region == 3) { user = userBrackets[msg.sender].east; oracle = oracleBracket.east; }
+    else if (region == 4) { user = userBrackets[msg.sender].midwest; oracle = oracleBracket.midwest; }
+
     uint8 score = 0;
     for (uint i=0; i<15; i++) {
-      if (userBrackets[msg.sender].quarterBracket[region-1][i] == oracleBracket.quarterBracket[region-1][i]) {
+      if (user[i] == oracle[i]) {
         score += 1;
       }
     }
@@ -143,9 +164,9 @@ contract Madness {
     } else if (score == leadingScore) {
       // If the sender ties, add him to the leaderboard.
       // NOTE: This could be problematic if there are many leaders, but let's hope it isn't?
-      for (uint i=0; i<leaders.length; i++) {
+      for (uint j=0; j<leaders.length; j++) {
         // Make sure the sender is not already among the leaders.
-        if (msg.sender == leaders[i]) { return true; }
+        if (msg.sender == leaders[j]) { return true; }
       }
       leaders.push(msg.sender);
     }
@@ -154,25 +175,65 @@ contract Madness {
   }
 
   //=========================================================
+  // Payout functions
+  //=========================================================
+
+  function issueWinner() {
+    if (now > FINAL_TIME) {
+      if (leaders.length == 1) { if (!leaders[0].send(pool)) { throw; } }
+      else {
+        // Hopefully this rounds down...
+        uint slice = pool / leaders.length;
+        for (uint i=0; i<leaders.length; i++) {
+          if (!leaders[i].send(slice)) { throw; }
+        }
+      }
+    }
+  }
+
+  function abort() {
+    // If something went wrong, users can withdraw their funds
+    if (ABORTED && userBrackets[msg.sender].started) {
+      if (!msg.sender.send(COST)) { throw; }
+    }
+  }
+
+  function setAbort() {
+    if (msg.sender == owner) {
+      if (!ABORTED) { ABORTED = true; }
+      ABORTED = false;
+    }
+  }
+
+  //=========================================================
   // GETTERS
   //=========================================================
 
   /**
    * Get a user's quarter bracket
-   * @param  {address} user - address of user. 0x0 for oracle bracket
-   * @param  {uint8} region - 1=South, 2=West, 3=East, 4=Midwest
+   * param  address user - address of user. 0x0 for oracle bracket
+   * param  uint8 region - 1=South, 2=West, 3=East, 4=Midwest
    */
   function getQuarterBracket(address user, uint region) public constant returns (uint8[15]){
-    if (user == 0x0) { return oracleBracket.quarterBracket[region-1]; }
-    else { return userBrackets[user].quarterBracket[region-1]; }
+    if (user == 0x0) {
+      if (region == 1) { return oracleBracket.south; }
+      else if (region == 2) { return oracleBracket.west; }
+      else if (region == 3) { return oracleBracket.east; }
+      else if (region == 4) { return oracleBracket.midwest; }
+    } else {
+      if (region == 1) { return userBrackets[msg.sender].south; }
+      else if (region == 2) { return userBrackets[msg.sender].west; }
+      else if (region == 3) { return userBrackets[msg.sender].east; }
+      else { return userBrackets[msg.sender].midwest; }
+    }
   }
 
   /**
    * Get a user's finalFour + championship brackets
-   * @param  {address} user - address of user. 0x0 for oracle bracket
+   * param  address user - address of user. 0x0 for oracle bracket
    */
   function getQuarterBracket(address user) public constant returns (uint8[6]){
-    uint8[6] toReturn;
+    uint8[6] memory toReturn;
     if (user == 0x0) {
       toReturn[0] = oracleBracket.finalFour[0][0];
       toReturn[1] = oracleBracket.finalFour[0][1];
