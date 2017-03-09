@@ -13,10 +13,10 @@ def getBracketTx(south, west, east, midwest, final_four, championship):
             data += str(final_four[i][j]).zfill(8)
     data += str(championship[0]).zfill(8)
     data += str(championship[1]).zfill(8)
-    return data
+    return '0x' + data
 
 def getCheckTx(addr):
     header = sha3.keccak_256('getCurrentScore(address)')
     data = header.hexdigest()[:8]
     data += addr
-    return data
+    return '0x' + data

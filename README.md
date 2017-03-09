@@ -1,6 +1,10 @@
 # March Madness (on Ethereum)
 
+**Contract address: **
+
 Welcome to March, my favorite month! I love this month because here in America we host the best sports tournament in the world - the [NCAA Basketball Tournament](https://en.wikipedia.org/wiki/NCAA_Division_I_Men's_Basketball_Tournament) (a.k.a. March Madness).
+
+## Background
 
 64 college basketball teams from all across America go head-to-head in a single-elimination fight to the top. Well, technically there are 68 teams, but I'll get into that later.
 
@@ -12,15 +16,13 @@ If you would like to participate (**buy in is 0.5ETH**), read on!
 
 Since I have a real job at ConsenSys and I just recently though of this, I don't have time to put out a fully functioning website, so I'm going to force you to use Python.
 
-### Tournament background
+### Time-frame
 
-The tournament starts promptly at 12:00 PM EST on Thursday, March 16 (unix = 1489683600) and concludes with the championship game at 9:00 PM EST on Monday, April 3 (ending roughly unix = 1491282000).
+The tournament starts promptly at 12:00 PM EST on Thursday, March 16 (unix = 1489683600) and concludes with the championship game at 9:00 PM EST on Monday, April 3 (ending roughly 3 hours later, at unix = 1491282000).
 
-You may fill out your bracket any time before the start date and may submit your bracket for review roughly 15 minutes after the championship ends.
+## How to participate
 
-### How it works
-
-You will fill out a bracket (See: Fill out a bracket) and submit this to the blockchain along with the buy-in cost of 0.5 ETH. You must submit your bracket **before** the tournament commences (i.e. before 1489683600). You may only submit one bracket per Ethereum address.
+You will fill out a bracket and submit this to the blockchain along with the buy-in cost of 0.5 ETH. You must submit your bracket **before** the tournament commences (i.e. before 1489683600). You may only submit one bracket per Ethereum address.
 
 Points are allocated as follows:
 * 1 point for each correctly chosen team in round of 64, 32, and sweet 16
@@ -29,9 +31,11 @@ Points are allocated as follows:
 
 *NOTE: Each game is scored independently of others, so as long as you pick the winning team, it doesn't matter if you incorrectly picked their opponent.*
 
-Once the tournament ends, you have **72 hours** to submit your score for review (ending at 1491530400). The highest score wins. If there is a tie, the pool is distributed evenly across winners.
+I will be responsible for submitting the **oracle bracket** (that is, the winners of the each game). I will add to it each day once games are concluded and you may compare your score whenever you'd like (more on this later).
 
-I will be responsible for submitting the **oracle bracket** (that is, the winners of the tournament). I will submit it once the championship ends, at which point you can start comparing your bracket. Yes yes I know, you need to trust me to be an arbiter of the truth. If you're uncomfortable with that, you are welcome to re-deploy this contract and start your own pool.
+Shortly after the tournament ends (give me ~15 min), you will have **72 hours** to submit your score for review (ending at 1491530400). When you submit your score (discussed later), you will be added as the leader if your score is higher than the current leader score. The highest score wins. If there is a tie, the pool is distributed evenly across winners.
+
+And before you ask, yes I know that you need to trust me to be an arbiter of the truth. If you're uncomfortable with that, you are welcome to re-deploy this contract and start your own pool.
 
 *NOTE: I have built an escape hatch so if something goes wrong, I will notify everyone with instructions on how to withdraw your 0.5 ETH. Sorry in advance if that happens.*
 
@@ -39,9 +43,9 @@ I will be responsible for submitting the **oracle bracket** (that is, the winner
 
 There are no fees. 100% of the pool goes to the winner[s].
 
-### Getting started
+## Creating a bracket
 
-Open up your command line, navigate to a new directory, and type the following:
+Before doing anything, you will need this repo. Open up your command line, navigate to a new directory, and type the following:
 
 ```
 git clone https://github.com/alex-miller-0/ethereum-march-madness.git
@@ -51,7 +55,7 @@ git clone https://github.com/alex-miller-0/ethereum-march-madness.git
 
 It's probably a good idea to fill out a bracket visually first. You can find one [here](http://www.ncaa.com/news/basketball-men/bracket-beat/march-madness-printable-ncaa-tournament-bracket) or [here](http://www.cbssports.com/college-basketball/ncaa-tournament/brackets/games/). You will only need this for reference later.
 
-I guess I should address the issue of there being 68 teams. For some reason, the tournament has the 4 weakest teams each play one game ahead of the tournament to vie for a 16 seed (the worst seed). The following day, the two winning teams must face the top 2 teams in the tournament (both 1 seeds). Historically, no 16 seed has ever beaten a 1 seed, so I'm going to neglect these extra 4 teams and mark them simply as 16 seeds (i.e. whoever wins a spot in the round of 64). *Hint: you might want to pick the 1 seed for these matchups.*
+I guess I should address the issue of there being 68 teams. For some reason, the tournament has the 4 weakest teams each play an extra game ahead of the tournament to vie for a 16 seed (the worst seed). The following day, the two winning teams must face the top 2 teams in the tournament (both 1 seeds). Historically, no 16 seed has ever beaten a 1 seed, so I'm going to neglect these extra 4 teams and mark them simply as 16 seeds (i.e. whoever wins a spot in the round of 64). *Hint: you might want to pick the 1 seed for these matchups.*
 
 ### Transcribe your picks into this command line tool
 
@@ -89,17 +93,40 @@ If you're using My Ether Wallet:
 4. Click `Advanced: Add Data` and paste the `data` parameter from before.
 5. Send the transaction!
 
+### Sending your Ethereum transaction locally
+
+If you have a node running locally, you can do cURL requests:
+
+```
+curl --data '{"method":"personal_unlockAccount","params":["<your address>","<your password>",null],"id":1,"jsonrpc":"2.0"}' -H "Content-Type: application/json" -X POST localhost:8545
+curl --data '{"jsonrpc":"2.0","method":"eth_sendTransaction","params":[{"to":"<contract address>","gas":"0x1E8480","value":"0x6F05B59D3B20000","from": "<your address>","data":"<string you got>"}],"id":1}'  -H "Content-Type: application/json" -X POST localhost:8545
+```
+
 You have now created your bracket!
 
-### During the tournament: Checking your score
+## During the tournament: Checking your score
 
-Once the tournament starts, you can check your score by opening up this directory again and running:
+Once the tournament starts, you can check your score by opening up a web3 console and doing the following:
 
 ```
-python checkScore.py <your address>
+var addr = "<contract address>";
+var contract = web3.eth.contract([{"constant":false,"inputs":[],"name":"setAbort","outputs":[{"name":"","type":"bool"}],"payable":false,"type":"function"},{"constant":true,"inputs":[],"name":"pool","outputs":[{"name":"","type":"uint256"}],"payable":false,"type":"function"},{"constant":false,"inputs":[],"name":"abort","outputs":[{"name":"","type":"bool"}],"payable":false,"type":"function"},{"constant":true,"inputs":[{"name":"user","type":"address"}],"name":"getQuarterScore","outputs":[{"name":"","type":"uint8"}],"payable":false,"type":"function"},{"constant":false,"inputs":[{"name":"south","type":"uint8[15]"},{"name":"west","type":"uint8[15]"},{"name":"east","type":"uint8[15]"},{"name":"midwest","type":"uint8[15]"},{"name":"finalFour","type":"uint8[4]"},{"name":"championship","type":"uint8[2]"}],"name":"setBracket","outputs":[{"name":"","type":"bool"}],"payable":true,"type":"function"},{"constant":false,"inputs":[],"name":"issueWinner","outputs":[{"name":"","type":"bool"}],"payable":false,"type":"function"},{"constant":true,"inputs":[],"name":"leadingScore","outputs":[{"name":"","type":"uint8"}],"payable":false,"type":"function"},{"constant":true,"inputs":[{"name":"","type":"uint256"}],"name":"leaders","outputs":[{"name":"","type":"address"}],"payable":false,"type":"function"},{"constant":true,"inputs":[{"name":"user","type":"address"}],"name":"getCurrentScore","outputs":[{"name":"","type":"uint8"}],"payable":false,"type":"function"},{"constant":true,"inputs":[],"name":"ABORTED","outputs":[{"name":"","type":"bool"}],"payable":false,"type":"function"},{"constant":false,"inputs":[],"name":"scoreBracket","outputs":[{"name":"","type":"bool"}],"payable":false,"type":"function"},{"constant":true,"inputs":[{"name":"user","type":"address"}],"name":"getFinalScores","outputs":[{"name":"","type":"uint8"}],"payable":false,"type":"function"},{"inputs":[],"payable":false,"type":"constructor"}])
+var instance = contract.at(addr)
+
+// Check your score
+instance.getScore(<your address>)
+
+// Check the highest score
+instance.leadingScore()
+
+// Get the leader(s)
+instance.leaders()
+
+// Get the total pool (in wei)
+instance.pool()
 ```
 
-### After the tournament: Submitting your score
+## After the tournament: Submitting your score
 
 Once the championship ends, you have 72 hours to submit your score if you think it is high enough to win (note: you can't win if you don't submit!). You will need to submit a new transaction to claim it. Use the following as your data parameter:
 
@@ -109,6 +136,8 @@ dc26824f
 
 (fun fact: this is the first 4 bytes of the [keccak_256](https://emn178.github.io/online-tools/keccak_256.html) hash of the function you are calling, which is `scoreBracket()`)
 
+### Using MEW
+
 If you're using My Ether Wallet:
 
 1. Go to `Send Ether & Tokens`.
@@ -117,8 +146,16 @@ If you're using My Ether Wallet:
 4. Click `Advanced: Add Data` and use `dc26824f` for the `data` parameter.
 5. Send the transaction!
 
-### Ending the pool
+### Using a local node:
 
-After the 72 hour submission period, I will call the `issueWinner()` function, which will send all funds to the winner(s) of the bracket pool.
+If you have a node running locally:
+
+```
+curl --data '{"jsonrpc":"2.0","method":"eth_sendTransaction","params":[{"to":"<contract address>","gas":"0x1E8480","from": "<your address>","data":"0xdc26824f"}],"id":1}'  -H "Content-Type: application/json" -X POST localhost:8545
+```
+
+## Ending the pool
+
+After the 72 hour submission period, I will call the `issueWinner()` function, which will send all funds to the winner(s) of the bracket pool. I will subsequently announce the winner and the winnings on Reddit.
 
 Good luck!
