@@ -1,5 +1,6 @@
 from teams import TEAMS
 from matchups import MATCHUPS
+import pickle
 
 def makeBracket():
     quarters = list()
@@ -38,9 +39,11 @@ def makeBracket():
     champ_B = TEAMS[regionB][str(final_four[1][1])]
     winner = makeFFPick(champ_A, champ_B, final_four[0][1], final_four[1][1])
     if winner == champ_A:
-        championship = [regionA, final_four[0][1]]
+        championship = [_regionA, final_four[0][1]]
     else:
-        championship = [regionB, final_four[1][1]]
+        championship = [_regionB, final_four[1][1]]
+    # Save picks for later
+    savePickle((quarters, final_four, championship), "picks")
 
     return (quarters, final_four, championship)
 
@@ -71,7 +74,7 @@ def pickQuarter(region, teams, matchups):
     a = teams[region][str(i)]
     b = teams[region][str(j)]
     picks.append(makePick(region, a, b, i, j))
-
+    return picks
 
 def makePick(region, a, b, i, j):
     pick = 0
@@ -86,3 +89,13 @@ def makeFFPick(a, b, i, j):
     if pick == "a":
         return a
     return b
+
+'''
+Save a pickle file with a dictionary
+@param {dict} d       - dictionary with your data
+@param {string} name  - name of the file you want to save (will be suffixed
+                        with .pkl and will be a hidden file)
+'''
+def savePickle(d, name):
+    with open('.%s.pkl'%name, 'wb') as handle:
+        pickle.dump(d, handle, protocol=pickle.HIGHEST_PROTOCOL)
