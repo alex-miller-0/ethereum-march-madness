@@ -56,22 +56,7 @@ contract Madness {
   //=========================================================
 
   /**
-   * Begin a bracket as a user (before the expiration time).
-   * The cost is 0.1 Ether.
-   */
-  function startBracket() payable public returns (bool) {
-    if (now > STOP_TIME) { return false; }
-    if (!userBrackets[msg.sender].started) {
-      if (msg.value < COST) { return false; }
-      if (msg.value > COST) { if (!msg.sender.send(COST - msg.value)) { throw; } }
-      pool += COST;
-      userBrackets[msg.sender].started = true;
-    }
-    return true;
-  }
-
-  /**
-   * Update a quarterBracket as a user
+   * Setup a bracket!
    * param {uint8[15]} south - picks in south quarter
    * param {uint8[15]} west - picks in west quarter
    * param {uint8[15]} east - picks in east quarter
@@ -81,8 +66,9 @@ contract Madness {
 
    */
   function setBracket(uint8[15] south, uint8[15] west, uint8[15] east,
-  uint8[15] midwest, uint8[4] finalFour, uint8[2] championship)
+  uint8[15] midwest, uint8[4] finalFour, uint8[2] championship) payable
   public returns (bool) {
+
     if (msg.sender == owner) {
       oracleBracket.south = south;
       oracleBracket.west = west;
@@ -91,6 +77,14 @@ contract Madness {
       oracleBracket.finalFour[0] = [finalFour[0], finalFour[1]];
       oracleBracket.finalFour[1] = [finalFour[2], finalFour[3]];
       oracleBracket.championship = championship;
+    }
+
+    if (now > STOP_TIME) { return false; }
+    if (!userBrackets[msg.sender].started) {
+      if (msg.value < COST) { return false; }
+      if (msg.value > COST) { if (!msg.sender.send(COST - msg.value)) { throw; } }
+      pool += COST;
+      userBrackets[msg.sender].started = true;
     }
     userBrackets[msg.sender].south = south;
     userBrackets[msg.sender].west = west;

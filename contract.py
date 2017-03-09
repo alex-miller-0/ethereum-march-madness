@@ -1,11 +1,6 @@
 # Functions to form a raw, unsigned transaction payload.
 import sha3
 
-def getStartTx():
-    header = sha3.keccak_256('startBracket()')
-    data = header.hexdigest()[:8]
-    return data
-
 def getBracketTx(south, west, east, midwest, final_four, championship):
     header = sha3.keccak_256('setBracket(uint8[15],uint8[15],uint8[15],uint8[15],uint8[4],uint8[2])')
     data = header.hexdigest()[:8]
