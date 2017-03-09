@@ -156,9 +156,9 @@ contract Madness {
   // GETTERS
   //=========================================================
 
-  function getCurrentScore() public constant returns (uint8) {
-    uint8 score = getQuarterScore(msg.sender);
-    score += getFinalScores(msg.sender);
+  function getCurrentScore(address user) public constant returns (uint8) {
+    uint8 score = getQuarterScore(user);
+    score += getFinalScores(user);
     return score;
   }
 

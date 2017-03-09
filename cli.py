@@ -8,7 +8,7 @@ def main():
     print '\n\nWelcome to March Madness 2017 - Ethereum edition\n=======================================\n'
     pickles = glob('.*.pkl')
     if '.picks.pkl' in pickles:
-        go = raw_input('Looks like you have a complete bracket saved. Do you want to use that? (1=yes 0=no) ')
+        go = raw_input('Looks like you have a complete bracket saved.\nDo you want to use that? (1=yes 0=no) ')
         if go == 0:
             (q, final_four, championship) = makeBracket()
         else:
