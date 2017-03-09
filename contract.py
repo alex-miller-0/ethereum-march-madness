@@ -9,6 +9,7 @@ def getBracketTx(south, west, east, midwest, final_four, championship):
             data += str(pick).zfill(8)
     for i in range(2):
         for j in range(2):
+            print final_four[i][j]
             data += str(final_four[i][j]).zfill(8)
     data += str(championship[0]).zfill(8)
     data += str(championship[1]).zfill(8)

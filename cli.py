@@ -9,7 +9,7 @@ def main():
     pickles = glob('.*.pkl')
     if '.picks.pkl' in pickles:
         go = raw_input('Looks like you have a complete bracket saved.\nDo you want to use that? (1=yes 0=no) ')
-        if go == 0:
+        if go == "0":
             (q, final_four, championship) = makeBracket()
         else:
             (q, final_four, championship) = loadPickle('picks')

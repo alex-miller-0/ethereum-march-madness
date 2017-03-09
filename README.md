@@ -85,7 +85,7 @@ If you're using My Ether Wallet:
 
 1. Copy the `data` parameter provided to you in the previous step and go to `Send Ether & Tokens`.
 2. In the `Amount to send` field, put `0.5ETH`.
-3. In the `gasLimit` put `1000000` (it shouldn't use this much and the remainder will be refunded).
+3. In the `gasLimit` put `2000000` (it shouldn't use this much and the remainder will be refunded).
 4. Click `Advanced: Add Data` and paste the `data` parameter from before.
 5. Send the transaction!
 
@@ -109,4 +109,16 @@ dc26824f
 
 (fun fact: this is the first 4 bytes of the [keccak_256](https://emn178.github.io/online-tools/keccak_256.html) hash of the function you are calling, which is `scoreBracket()`)
 
-Submit a transaction like you did before (e.g. using MEW). Put a gasLimit of `2000000` this time (again, this is probably higher than you need).
+If you're using My Ether Wallet:
+
+1. Go to `Send Ether & Tokens`.
+2. In the `Amount to send` field, put `0`.
+3. In the `gasLimit` put `2000000` (it shouldn't use this much and the remainder will be refunded).
+4. Click `Advanced: Add Data` and use `dc26824f` for the `data` parameter.
+5. Send the transaction!
+
+### Ending the pool
+
+After the 72 hour submission period, I will call the `issueWinner()` function, which will send all funds to the winner(s) of the bracket pool.
+
+Good luck!

@@ -15,29 +15,29 @@ def makeBracket():
     ff_west = TEAMS["West"][str(quarters[1][13])]
     ff1_winner = makeFFPick(ff_south, ff_west, quarters[0][13], quarters[1][13])
     if ff1_winner == ff_south:
-        final_four.append([0, quarters[0][13]])
+        final_four.append([1, quarters[0][13]])
     else:
-        final_four.append([1, quarters[1][13]])
+        final_four.append([2, quarters[1][13]])
     # Final 4 - Game 2
     ff_east = TEAMS["East"][str(quarters[2][13])]
     ff_midwest = TEAMS["Midwest"][str(quarters[3][13])]
     ff2_winner = makeFFPick(ff_east, ff_midwest, quarters[2][13], quarters[3][13])
     if ff1_winner == ff_south:
-        final_four.append([2, quarters[2][13]])
+        final_four.append([3, quarters[2][13]])
     else:
-        final_four.append([3, quarters[3][13]])
+        final_four.append([4, quarters[3][13]])
     # Championship
     _regionA = final_four[0][0]
     _regionB = final_four[1][0]
     regionA = "South"
-    if _regionA == 1:
+    if _regionA == 2:
         regionA = "West"
     regionB = "East"
-    if _regionB == 3:
+    if _regionB == 4:
         regionB == "Midwest"
     champ_A = TEAMS[regionA][str(final_four[0][1])]
     champ_B = TEAMS[regionB][str(final_four[1][1])]
-    winner = makeFFPick(champ_A, champ_B, final_four[0][1], final_four[1][1])
+    winner = makeChampPick(champ_A, champ_B, final_four[0][1], final_four[1][1])
     if winner == champ_A:
         championship = [_regionA, final_four[0][1]]
     else:
@@ -89,6 +89,15 @@ def makeFFPick(a, b, i, j):
     if pick == "a":
         return a
     return b
+# WET code... WE ENJOY TYPING
+def makeChampPick(a, b, i, j):
+    pick = 0
+    while (pick not in ["a", "b"]):
+        pick = raw_input("Championship: [a] %s (%s) vs [b] %s (%s) - pick a or b: "%(a, i, b, j))
+    if pick == "a":
+        return a
+    return b
+
 
 '''
 Save a pickle file with a dictionary

@@ -2,10 +2,10 @@ pragma solidity ^0.4.8;
 
 contract Madness {
   address owner;
-  uint COST = 100000000000000000; // 0.1 ETH
+  uint COST = 500000000000000000; // 0.5 ETH
   uint STOP_TIME = 1489683600; // Time the tournament starts
   uint FINAL_TIME = 1491530400; // 48 hours after the tournament ends
-  bool ABORTED = false;
+  bool public ABORTED = false;
 
   // The bracket is comprised of a bunch of integer slots.
   // The integer supplied indicates the seed number of the predicted winner.
@@ -36,14 +36,14 @@ contract Madness {
   mapping (address => bracket) userBrackets;
 
   // The pool of funds (in wei)
-  uint pool;
+  uint public pool;
 
   // This is input by the owner of the contract. It may be disputed for 24 hours.
   bracket oracleBracket;
 
   // Keep a tally of the leading score and the leaders
-  uint8 leadingScore;
-  address[] leaders;
+  uint8 public leadingScore;
+  address[] public leaders;
 
   // Set the msg.sender as the owner.
   function Madness() {
@@ -76,22 +76,27 @@ contract Madness {
       oracleBracket.finalFour[0] = [finalFour[0], finalFour[1]];
       oracleBracket.finalFour[1] = [finalFour[2], finalFour[3]];
       oracleBracket.championship = championship;
+      if (!msg.sender.send(msg.value)) { throw; }
+      return true;
+    } else {
+      if (now > STOP_TIME) { return false; }
+      if (!userBrackets[msg.sender].started) {
+        if (msg.value < COST) { return false; }
+        if (msg.value > COST) { if (!msg.sender.send(COST - msg.value)) { throw; } }
+        pool += COST;
+        userBrackets[msg.sender].started = true;
+        userBrackets[msg.sender].south = south;
+        userBrackets[msg.sender].west = west;
+        userBrackets[msg.sender].east = east;
+        userBrackets[msg.sender].midwest = midwest;
+        userBrackets[msg.sender].finalFour[0] = [finalFour[0], finalFour[1]];
+        userBrackets[msg.sender].finalFour[1] = [finalFour[2], finalFour[3]];
+        userBrackets[msg.sender].championship = championship;
+      } else {
+        // If the user already has a bracket, return all monies.
+        if (!msg.sender.send(msg.value)) { throw; }
+      }
     }
-
-    if (now > STOP_TIME) { return false; }
-    if (!userBrackets[msg.sender].started) {
-      if (msg.value < COST) { return false; }
-      if (msg.value > COST) { if (!msg.sender.send(COST - msg.value)) { throw; } }
-      pool += COST;
-      userBrackets[msg.sender].started = true;
-    }
-    userBrackets[msg.sender].south = south;
-    userBrackets[msg.sender].west = west;
-    userBrackets[msg.sender].east = east;
-    userBrackets[msg.sender].midwest = midwest;
-    userBrackets[msg.sender].finalFour[0] = [finalFour[0], finalFour[1]];
-    userBrackets[msg.sender].finalFour[1] = [finalFour[2], finalFour[3]];
-    userBrackets[msg.sender].championship = championship;
     return true;
   }
 
@@ -101,7 +106,6 @@ contract Madness {
    */
   function scoreBracket() public returns (bool) {
     uint8 score = getCurrentScore(msg.sender);
-
     // Check the bracket against the leaderboard
     userBrackets[msg.sender].totalScore = score;
     if (score > leadingScore) {
@@ -116,7 +120,6 @@ contract Madness {
       }
       leaders.push(msg.sender);
     }
-
     return true;
   }
 
@@ -124,7 +127,7 @@ contract Madness {
   // Payout functions
   //=========================================================
 
-  function issueWinner() {
+  function issueWinner() public returns (bool) {
     if (now > FINAL_TIME) {
       if (leaders.length == 1) { if (!leaders[0].send(pool)) { throw; } }
       else {
@@ -134,18 +137,22 @@ contract Madness {
           if (!leaders[i].send(slice)) { throw; }
         }
       }
+      return true;
     }
+    return false;
   }
 
   // If something went wrong, users can withdraw their funds here
-  function abort() {
+  function abort() public returns (bool) {
     if (ABORTED && userBrackets[msg.sender].started) {
       if (!msg.sender.send(COST)) { throw; }
     }
+    return true;
   }
 
-  function setAbort() {
+  function setAbort() public returns (bool) {
     if (msg.sender == owner) { ABORTED = true; }
+    return true;
   }
 
   //=========================================================
