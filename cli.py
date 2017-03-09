@@ -7,20 +7,41 @@ def main():
     final_four = list()
     championship = 0
     for region in ["South", "West", "East", "Midwest"]:
-        q = pickQuarter(region, TEAMS, MATCHUPS)
-        quarters.append(q)
+       q = pickQuarter(region, TEAMS, MATCHUPS)
+       quarters.append(q)
+
     # Final 4 - Game 1
-    ff_south = TEAMS[quarters[0][13]]
-    ff_west = TEAMS[quarters[1][13]]
-    final_four.append(makePick("Final Four", a, b, quarters[0][13], quarters[1][13]))
+    ff_south = TEAMS["South"][str(quarters[0][13])]
+    ff_west = TEAMS["West"][str(quarters[1][13])]
+    ff1_winner = makeFFPick(ff_south, ff_west, quarters[0][13], quarters[1][13])
+    if ff1_winner == ff_south:
+        final_four.append([0, quarters[0][13]])
+    else:
+        final_four.append([1, quarters[1][13]])
     # Final 4 - Game 2
-    ff_east = TEAMS[quarters[0][13]]
-    ff_midwest = TEAMS[quarters[1][13]]
-    final_four.append(makePick("Final Four", a, b, quarters[2][13], quarters[3][13]))
+    ff_east = TEAMS["East"][str(quarters[2][13])]
+    ff_midwest = TEAMS["Midwest"][str(quarters[3][13])]
+    ff2_winner = makeFFPick(ff_east, ff_midwest, quarters[2][13], quarters[3][13])
+    if ff1_winner == ff_south:
+        final_four.append([2, quarters[2][13]])
+    else:
+        final_four.append([3, quarters[3][13]])
     # Championship
-    champ_A = TEAMS[final_four[0]]
-    champ_B = TEAMS[final_four[1]]
-    championship = makePick("Championship", a, b, final_four[0], final_four[1])
+    _regionA = final_four[0][0]
+    _regionB = final_four[1][0]
+    regionA = "South"
+    if _regionA == 1:
+        regionA = "West"
+    regionB = "East"
+    if _regionB == 3:
+        regionB == "Midwest"
+    champ_A = TEAMS[regionA][str(final_four[0][1])]
+    champ_B = TEAMS[regionB][str(final_four[1][1])]
+    winner = makeFFPick(champ_A, champ_B, final_four[0][1], final_four[1][1])
+    if winner == champ_A:
+        championship = [regionA, final_four[0][1]]
+    else:
+        championship = [regionB, final_four[1][1]]
 
 
 def pickQuarter(region, teams, matchups):
@@ -57,6 +78,15 @@ def makePick(region, a, b, i, j):
     while (pick not in [str(i), str(j)]):
         pick = raw_input("%s: %s (%s) vs %s (%s) - pick seed of winner: "%(region, a, i, b, j))
     return pick
+
+def makeFFPick(a, b, i, j):
+    pick = 0
+    while (pick not in ["a", "b"]):
+        pick = raw_input("Final Four: [a] %s (%s) vs [b] %s (%s) - pick a or b: "%(a, i, b, j))
+    if pick == "a":
+        return a
+    return b
+
 
 if __name__ == "__main__":
     main()
