@@ -72,89 +72,42 @@ contract Madness {
 
   /**
    * Update a quarterBracket as a user
-   * param {uint8} region - 1=South, 2=West, 3=East, 4=Midwest
-   * param {uint8[15]} games - winning seed (1-16) for each game, starting at the top
-   */
-  function setQuarterBracket(uint8 region, uint8[15] games) public returns (bool) {
-    if (msg.sender == owner) {
-      if (region == 1) { oracleBracket.south = games; }
-      else if (region == 2) { oracleBracket.west = games; }
-      else if (region == 3) { oracleBracket.east = games; }
-      else if (region == 4) { oracleBracket.midwest = games; }
-    } else {
-      if (region == 1) { userBrackets[msg.sender].south = games; }
-      else if (region == 2) { userBrackets[msg.sender].west = games; }
-      else if (region == 3) { userBrackets[msg.sender].east = games; }
-      else if (region == 4) { userBrackets[msg.sender].midwest = games; }
-    }
-    return true;
-  }
+   * param {uint8[15]} south - picks in south quarter
+   * param {uint8[15]} west - picks in west quarter
+   * param {uint8[15]} east - picks in east quarter
+   * param {uint8[15]} midwest - picks in midwest quarter
+   * param {uint8[4]}  final_four - picks for final Four [[region, seed], ]
+   * param {uint8[2]}  championship - picks for champ [region, seed]
 
-  /**
-   * Update the finalFour and championship predictions.
-   * param uint[4] finalFour - [finalFour[0][0], finalFour[0][1], finalFour[1][0], finalFour[1][1]
-   * param uint[2] championship - [region, seed]
    */
-  function setFinals(uint8[4] finalFour, uint8[2] championship) public returns (bool) {
+  function setBracket(uint8[15] south, uint8[15] west, uint8[15] east,
+  uint8[15] midwest, uint8[4] finalFour, uint8[2] championship)
+  public returns (bool) {
     if (msg.sender == owner) {
+      oracleBracket.south = south;
+      oracleBracket.west = west;
+      oracleBracket.east = east;
+      oracleBracket.midwest = midwest;
       oracleBracket.finalFour[0] = [finalFour[0], finalFour[1]];
       oracleBracket.finalFour[1] = [finalFour[2], finalFour[3]];
       oracleBracket.championship = championship;
-    } else {
-      userBrackets[msg.sender].finalFour[0] = [finalFour[0], finalFour[1]];
-      userBrackets[msg.sender].finalFour[1] = [finalFour[2], finalFour[3]];
-      userBrackets[msg.sender].championship = championship;
     }
+    userBrackets[msg.sender].south = south;
+    userBrackets[msg.sender].west = west;
+    userBrackets[msg.sender].east = east;
+    userBrackets[msg.sender].midwest = midwest;
+    userBrackets[msg.sender].finalFour[0] = [finalFour[0], finalFour[1]];
+    userBrackets[msg.sender].finalFour[1] = [finalFour[2], finalFour[3]];
+    userBrackets[msg.sender].championship = championship;
     return true;
   }
 
   /**
-   * Score a particular quarter bracket for the message sender.
-   * Bracket must be stared.
-   * param  uint8 region - 1=South, 2=West, 3=East, 4=Midwest
+   * Calculate the score of the bracket and put the user in the leaderboard
+   * if appropriate.
    */
-  function scoreQuarterBracket(uint8 region) public returns (bool) {
-    if (!userBrackets[msg.sender].started) { return false; }
-    uint8[15] memory user;
-    uint8[15] memory oracle;
-    if (region == 1) { user = userBrackets[msg.sender].south; oracle = oracleBracket.south; }
-    else if (region == 2) { user = userBrackets[msg.sender].west; oracle = oracleBracket.west; }
-    else if (region == 3) { user = userBrackets[msg.sender].east; oracle = oracleBracket.east; }
-    else if (region == 4) { user = userBrackets[msg.sender].midwest; oracle = oracleBracket.midwest; }
-
-    uint8 score = 0;
-    for (uint i=0; i<15; i++) {
-      if (user[i] == oracle[i]) {
-        score += 1;
-      }
-    }
-    userBrackets[msg.sender].quarterBracketScore[region-1] = score;
-    return true;
-  }
-
-  /**
-   * Calculate the final score once all four quarterBracket scores have been calculated.
-   * Bracket must be started.
-   */
-  function finishScore() public returns (bool) {
-    if (!userBrackets[msg.sender].started) { return false; }
-    uint8 score = 0;
-    for (uint i=0; i<4; i++) {
-      // Include all quarterBracketScores
-      score += userBrackets[msg.sender].quarterBracketScore[i];
-      // Add final four scores (worth 2 points for correct prediction)
-      if (i < 2) {
-        if (userBrackets[msg.sender].finalFour[i][0] == oracleBracket.finalFour[i][0]
-          && userBrackets[msg.sender].finalFour[i][1] == oracleBracket.finalFour[i][1]) {
-          score += 2;
-        }
-      }
-    }
-    // Championship prediction is worth 4 points
-    if (userBrackets[msg.sender].championship[0] == oracleBracket.championship[0]
-      && userBrackets[msg.sender].championship[1] == oracleBracket.championship[1]) {
-      score += 4;
-    }
+  function scoreBracket() public returns (bool) {
+    uint8 score = getCurrentScore();
 
     // Check the bracket against the leaderboard
     userBrackets[msg.sender].totalScore = score;
@@ -208,6 +161,43 @@ contract Madness {
   //=========================================================
   // GETTERS
   //=========================================================
+
+  function getCurrentScore() public constant returns (uint8) {
+    uint8 score = getQuarterScore(msg.sender);
+    score += getFinalScores(msg.sender);
+    return score;
+  }
+
+  function getQuarterScore(address user) public constant returns (uint8) {
+    uint8 score = 0;
+    for (uint i=0; i<15; i++) {
+      if (userBrackets[user].south[i] == oracleBracket.south[i]) { score += 1; }
+      if (userBrackets[user].west[i] == oracleBracket.west[i]) { score += 1; }
+      if (userBrackets[user].east[i] == oracleBracket.east[i]) { score += 1; }
+      if (userBrackets[user].midwest[i] == oracleBracket.midwest[i]) { score += 1; }
+    }
+    return score;
+  }
+
+  function getFinalScores(address user) public constant returns (uint8) {
+    uint8 score = 0;
+    for (uint i=0; i<4; i++) {
+      // Include all quarterBracketScores
+      score += userBrackets[user].quarterBracketScore[i];
+      // Add final four scores (worth 2 points for correct prediction)
+      if (i < 2) {
+        if (userBrackets[user].finalFour[i][0] == oracleBracket.finalFour[i][0]
+          && userBrackets[user].finalFour[i][1] == oracleBracket.finalFour[i][1]) {
+          score += 2;
+        }
+      }
+    }
+    // Championship prediction is worth 4 points
+    if (userBrackets[user].championship[0] == oracleBracket.championship[0]
+      && userBrackets[user].championship[1] == oracleBracket.championship[1]) {
+      score += 4;
+    }
+  }
 
   /**
    * Get a user's quarter bracket
