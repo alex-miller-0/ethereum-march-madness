@@ -128,7 +128,7 @@ contract Madness {
     if (now > FINAL_TIME) {
       if (leaders.length == 1) { if (!leaders[0].send(pool)) { throw; } }
       else {
-        // Hopefully this rounds down...
+        // Hopefully this rounds down... ¯\_(ツ)_/¯
         uint slice = pool / leaders.length;
         for (uint i=0; i<leaders.length; i++) {
           if (!leaders[i].send(slice)) { throw; }
@@ -137,18 +137,15 @@ contract Madness {
     }
   }
 
+  // If something went wrong, users can withdraw their funds here
   function abort() {
-    // If something went wrong, users can withdraw their funds
     if (ABORTED && userBrackets[msg.sender].started) {
       if (!msg.sender.send(COST)) { throw; }
     }
   }
 
   function setAbort() {
-    if (msg.sender == owner) {
-      if (!ABORTED) { ABORTED = true; }
-      ABORTED = false;
-    }
+    if (msg.sender == owner) { ABORTED = true; }
   }
 
   //=========================================================
@@ -186,6 +183,7 @@ contract Madness {
       && userBrackets[user].championship[1] == oracleBracket.championship[1]) {
       score += 4;
     }
+    return score;
   }
 
 }

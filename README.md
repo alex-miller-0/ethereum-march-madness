@@ -10,7 +10,7 @@ As a huge [Arizona basketball](http://www.arizonawildcats.com/schedule.aspx?sche
 
 If you would like to participate (**buy in is 0.5ETH**), read on!
 
-Since this happens pretty quickly, I don't have time to put out a fully functioning website, so I'm going to force you to use Python.
+Since I have a real job at ConsenSys and I just recently though of this, I don't have time to put out a fully functioning website, so I'm going to force you to use Python.
 
 ### Tournament background
 
@@ -43,7 +43,9 @@ There are no fees. 100% of the pool goes to the winner[s].
 
 Open up your command line, navigate to a new directory, and type the following:
 
-`git clone https://github.com/alex-miller-0/ethereum-march-madness.git`
+```
+git clone https://github.com/alex-miller-0/ethereum-march-madness.git
+```
 
 ### Fill out a bracket
 
@@ -82,14 +84,14 @@ That hex string at the bottom is what you will need to copy and paste into your 
 If you're using My Ether Wallet:
 
 1. Copy the `data` parameter provided to you in the previous step and go to `Send Ether & Tokens`.
-2. In the `Amount to send` field, put **0.5ETH**.
+2. In the `Amount to send` field, put `0.5ETH`.
 3. In the `gasLimit` put `1000000` (it shouldn't use this much and the remainder will be refunded).
 4. Click `Advanced: Add Data` and paste the `data` parameter from before.
 5. Send the transaction!
 
 You have now created your bracket!
 
-### Checking your score
+### During the tournament: Checking your score
 
 Once the tournament starts, you can check your score by opening up this directory again and running:
 
@@ -97,9 +99,9 @@ Once the tournament starts, you can check your score by opening up this director
 python checkScore.py <your address>
 ```
 
-### Submitting your score
+### After the tournament: Submitting your score
 
-If you think your score is high, you will need to submit a new transaction to claim it. Use the following as your data parameter:
+Once the championship ends, you have 72 hours to submit your score if you think it is high enough to win (note: you can't win if you don't submit!). You will need to submit a new transaction to claim it. Use the following as your data parameter:
 
 ```
 dc26824f
