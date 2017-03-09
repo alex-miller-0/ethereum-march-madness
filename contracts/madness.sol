@@ -100,7 +100,7 @@ contract Madness {
    * if appropriate.
    */
   function scoreBracket() public returns (bool) {
-    uint8 score = getCurrentScore();
+    uint8 score = getCurrentScore(msg.sender);
 
     // Check the bracket against the leaderboard
     userBrackets[msg.sender].totalScore = score;
@@ -174,15 +174,11 @@ contract Madness {
 
   function getFinalScores(address user) public constant returns (uint8) {
     uint8 score = 0;
-    for (uint i=0; i<4; i++) {
-      // Include all quarterBracketScores
-      score += userBrackets[user].quarterBracketScore[i];
+    for (uint i=0; i<2; i++) {
       // Add final four scores (worth 2 points for correct prediction)
-      if (i < 2) {
-        if (userBrackets[user].finalFour[i][0] == oracleBracket.finalFour[i][0]
-          && userBrackets[user].finalFour[i][1] == oracleBracket.finalFour[i][1]) {
-          score += 2;
-        }
+      if (userBrackets[user].finalFour[i][0] == oracleBracket.finalFour[i][0]
+        && userBrackets[user].finalFour[i][1] == oracleBracket.finalFour[i][1]) {
+        score += 2;
       }
     }
     // Championship prediction is worth 4 points
