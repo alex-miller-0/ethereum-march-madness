@@ -1,11 +1,10 @@
 pragma solidity ^0.4.8;
 
-
 contract Madness {
   address owner;
   uint COST = 100000000000000000; // 0.1 ETH
-  uint STOP_TIME = 1489012283; // Time the tournament starts
-  uint FINAL_TIME = 1489012283; // 48 hours after the tournament ends
+  uint STOP_TIME = 1489683600; // Time the tournament starts
+  uint FINAL_TIME = 1491530400; // 48 hours after the tournament ends
   bool ABORTED = false;
 
   // The bracket is comprised of a bunch of integer slots.
@@ -192,50 +191,5 @@ contract Madness {
       score += 4;
     }
   }
-
-  /**
-   * Get a user's quarter bracket
-   * param  address user - address of user. 0x0 for oracle bracket
-   * param  uint8 region - 1=South, 2=West, 3=East, 4=Midwest
-   */
-  function getQuarterBracket(address user, uint region) public constant returns (uint8[15]){
-    if (user == 0x0) {
-      if (region == 1) { return oracleBracket.south; }
-      else if (region == 2) { return oracleBracket.west; }
-      else if (region == 3) { return oracleBracket.east; }
-      else if (region == 4) { return oracleBracket.midwest; }
-    } else {
-      if (region == 1) { return userBrackets[msg.sender].south; }
-      else if (region == 2) { return userBrackets[msg.sender].west; }
-      else if (region == 3) { return userBrackets[msg.sender].east; }
-      else { return userBrackets[msg.sender].midwest; }
-    }
-  }
-
-  /**
-   * Get a user's finalFour + championship brackets
-   * param  address user - address of user. 0x0 for oracle bracket
-   */
-  function getQuarterBracket(address user) public constant returns (uint8[6]){
-    uint8[6] memory toReturn;
-    if (user == 0x0) {
-      toReturn[0] = oracleBracket.finalFour[0][0];
-      toReturn[1] = oracleBracket.finalFour[0][1];
-      toReturn[2] = oracleBracket.finalFour[1][0];
-      toReturn[3] = oracleBracket.finalFour[1][1];
-      toReturn[4] = oracleBracket.championship[0];
-      toReturn[5] = oracleBracket.championship[1];
-    } else {
-      toReturn[0] = userBrackets[user].finalFour[0][0];
-      toReturn[1] = userBrackets[user].finalFour[0][1];
-      toReturn[2] = userBrackets[user].finalFour[1][0];
-      toReturn[3] = userBrackets[user].finalFour[1][1];
-      toReturn[4] = userBrackets[user].championship[0];
-      toReturn[5] = userBrackets[user].championship[1];
-    }
-    return toReturn;
-  }
-
-
 
 }

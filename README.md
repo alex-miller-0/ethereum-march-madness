@@ -1,6 +1,6 @@
-# ethereum-march-madness
+# March Madness (on Ethereum)
 
-Welcome to my favorite month (March). I love this month because here in America we have the best sports tournament in the world - the NCAA Basketball Tournament (a.k.a. March Madness).
+Welcome to March, my favorite month! I love this month because here in America we host the best sports tournament in the world - the [NCAA Basketball Tournament](https://en.wikipedia.org/wiki/NCAA_Division_I_Men's_Basketball_Tournament) (a.k.a. March Madness).
 
 64 college basketball teams from all across America go head-to-head in a single-elimination fight to the top. Well, technically there are 68 teams, but I'll get into that later.
 
@@ -12,11 +12,11 @@ If you would like to participate (**buy in is 0.5ETH**), read on!
 
 Since this happens pretty quickly, I don't have time to put out a fully functioning website, so I'm going to force you to use Python.
 
-### Getting started
+### Tournament background
 
 The tournament starts promptly at 12:00 PM EST on Thursday, March 16 (unix = 1489683600) and concludes with the championship game at 9:00 PM EST on Monday, April 3 (ending roughly unix = 1491282000).
 
-You may fill out your bracket any time before the start date and may submit your bracket for review any time after unix 1491282000.
+You may fill out your bracket any time before the start date and may submit your bracket for review roughly 15 minutes after the championship ends.
 
 ### How it works
 
@@ -27,9 +27,19 @@ Points are allocated as follows:
 * 2 points for each correctly chosen team in the final four
 * 4 points for the correctly chosen champion
 
-Each game is scored independently of others, so as long as you pick the winning team, it doesn't matter if you incorrectly picked their opponent.
+*NOTE: Each game is scored independently of others, so as long as you pick the winning team, it doesn't matter if you incorrectly picked their opponent.*
 
-### Clone this repo
+Once the tournament ends, you have **72 hours** to submit your score for review (ending at 1491530400). The highest score wins. If there is a tie, the pool is distributed evenly across winners.
+
+I will be responsible for submitting the **oracle bracket** (that is, the winners of the tournament). I will submit it once the championship ends, at which point you can start comparing your bracket. Yes yes I know, you need to trust me to be an arbiter of the truth. If you're uncomfortable with that, you are welcome to re-deploy this contract and start your own pool.
+
+*NOTE: I have built an escape hatch so if something goes wrong, I will notify everyone with instructions on how to withdraw your 0.5 ETH. Sorry in advance if that happens.*
+
+### Fees
+
+There are no fees. 100% of the pool goes to the winner[s].
+
+### Getting started
 
 Open up your command line, navigate to a new directory, and type the following:
 
