@@ -69,6 +69,7 @@ contract Madness {
   public returns (bool) {
 
     if (msg.sender == owner) {
+      // Owner can update oracleBracket any time and for free
       oracleBracket.south = south;
       oracleBracket.west = west;
       oracleBracket.east = east;
@@ -76,14 +77,23 @@ contract Madness {
       oracleBracket.finalFour[0] = [finalFour[0], finalFour[1]];
       oracleBracket.finalFour[1] = [finalFour[2], finalFour[3]];
       oracleBracket.championship = championship;
-      if (!msg.sender.send(msg.value)) { throw; }
-      return true;
+      // Refund if owner accidentally sent ether
+      if (msg.value > 0) {
+        if (!msg.sender.send(msg.value)) { throw; }
+      }
     } else {
+      // Users may only submit/update brackets before the tournament starts.
       if (now > STOP_TIME) { return false; }
-      if (msg.value < COST) { return false; }
-      if (msg.value > COST) { if (!msg.sender.send(COST - msg.value)) { throw; } }
-      pool += COST;
-      userBrackets[msg.sender].started = true;
+      // Refunds and checks on msg.value
+      if (userBrackets[msg.sender].started && msg.value > 0) { if (!msg.sender.send(msg.value)) { throw; } }
+      else if (!userBrackets[msg.sender].started && msg.value < COST) { return false; }
+      else if (msg.value > COST) { if (!msg.sender.send(COST - msg.value)) { throw; } }
+      // Increase the pool if this is the first time the user has submitted
+      if (!userBrackets[msg.sender].started) {
+        pool += COST;
+        userBrackets[msg.sender].started = true;
+      }
+      // Update the data regardless
       userBrackets[msg.sender].south = south;
       userBrackets[msg.sender].west = west;
       userBrackets[msg.sender].east = east;
@@ -192,7 +202,7 @@ contract Madness {
 
   function getQuarterScore(address user) public constant returns (uint8) {
     uint8 score = 0;
-    for (uint i=0; i<15; i++) {
+    for (uint i=0; i<14; i++) {
       if (oracleBracket.south[i] > 0 && userBrackets[user].south[i] == oracleBracket.south[i]) { score += 1; }
       if (oracleBracket.west[i] > 0 && userBrackets[user].west[i] == oracleBracket.west[i]) { score += 1; }
       if (oracleBracket.east[i] > 0 && userBrackets[user].east[i] == oracleBracket.east[i]) { score += 1; }
