@@ -3,8 +3,8 @@ pragma solidity ^0.4.8;
 contract Madness {
   address public owner;
   uint COST = 500000000000000000; // 0.5 ETH
-  uint STOP_TIME = 1489683600; // Time the tournament starts
-  uint FINAL_TIME = 1491530400; // 48 hours after the tournament ends
+  uint STOP_TIME = 1489680000; // 3/16/17 11AM EST (Time the tournament starts)
+  uint FINAL_TIME = 1491541200; // 4/7/17 12AM EST (~72 hours after the tournament ends)
   bool public ABORTED = false;
 
   // The bracket is comprised of a bunch of integer slots.
@@ -56,12 +56,12 @@ contract Madness {
 
   /**
    * Setup a bracket!
-   * param {uint8[14]} south - picks in south quarter
-   * param {uint8[14]} west - picks in west quarter
-   * param {uint8[14]} east - picks in east quarter
-   * param {uint8[14]} midwest - picks in midwest quarter
-   * param {uint8[4]}  final_four - picks for final Four [[region, seed], ]
-   * param {uint8[2]}  championship - picks for champ [region, seed]
+   * param uint8[14] south - picks in south quarter
+   * param uint8[14] west - picks in west quarter
+   * param uint8[14] east - picks in east quarter
+   * param uint8[14] midwest - picks in midwest quarter
+   * param uint8[4]  final_four - picks for final Four [[region, seed], ]
+   * param uint8[2]  championship - picks for champ [region, seed]
 
    */
   function setBracket(uint8[14] south, uint8[14] west, uint8[14] east,
@@ -148,14 +148,14 @@ contract Madness {
   }
 
   // If something went wrong, users can withdraw their funds here
-  function abort() public returns (bool) {
+  function withdraw() public returns (bool) {
     if (ABORTED && userBrackets[msg.sender].started) {
       if (!msg.sender.send(COST)) { throw; }
     }
     return true;
   }
 
-  function setAbort() public returns (bool) {
+  function abort() public returns (bool) {
     if (msg.sender == owner) { ABORTED = true; }
     return true;
   }
@@ -164,7 +164,13 @@ contract Madness {
   // GETTERS
   //=========================================================
 
-  function getQuarter(address user, uint region) public constant returns (uint8[14]) {
+  /**
+   * Get a user's bracket for a given region
+   * param  address user - address of the user in question (can be anyone)
+   * param  uint    region  - 1=south, 2=west, 3=east, 4=midwest
+   * return uint8[14]       - the user's 15 winners for the quarter bracket
+   */
+  function getQuarter(address user, uint8 region) public constant returns (uint8[14]) {
     if (region == 1) {
       return userBrackets[user].south;
     } else if (region == 2) {
@@ -175,10 +181,32 @@ contract Madness {
       return userBrackets[user].midwest;
     }
   }
+
+  /**
+   * Get a user's picks for the final four and championship
+   * param  address user - address of the user in question (can be anyone)
+   * return uint8[6]     - [ff_game1_winner_region, ff_game1_winner_seed,
+   *                           ff_game2_winner_region, ff_game2_winner_seed,
+   *                           champ_winner_region, champ_winner_seed]
+   *                          (region - 1=south, 2=west, 3=east, 4=midwest)
+   */
   function getFinals(address user) public constant returns (uint8[6]) {
-    return [userBrackets[user].finalFour[0][0],userBrackets[user].finalFour[0][1],userBrackets[user].finalFour[1][0],userBrackets[user].finalFour[1][1],userBrackets[user].championship[0],userBrackets[user].championship[1]];
+    return [
+      userBrackets[user].finalFour[0][0],
+      userBrackets[user].finalFour[0][1],
+      userBrackets[user].finalFour[1][0],
+      userBrackets[user].finalFour[1][1],
+      userBrackets[user].championship[0],
+      userBrackets[user].championship[1]
+    ];
   }
-  function getOracleQuarter(uint region) public constant returns (uint8[14]) {
+
+  /**
+   * Get the oracle's bracket for a given region
+   * param  uint8    region  - 1=south, 2=west, 3=east, 4=midwest
+   * return uint8[14]       - the user's 15 winners for the quarter bracket
+   */
+  function getOracleQuarter(uint8 region) public constant returns (uint8[14]) {
     if (region == 1) {
       return oracleBracket.south;
     } else if (region == 2) {
@@ -189,48 +217,50 @@ contract Madness {
       return oracleBracket.midwest;
     }
   }
+
+  /**
+   * Get the oracle's picks for the final four and championship
+   * return uint8[6]     - [ff_game1_winner_region, ff_game1_winner_seed,
+   *                         ff_game2_winner_region, ff_game2_winner_seed,
+   *                         champ_winner_region, champ_winner_seed]
+   *                        (region - 1=south, 2=west, 3=east, 4=midwest)
+   */
   function getOracleFinals() public constant returns (uint8[6]) {
     return [oracleBracket.finalFour[0][0],oracleBracket.finalFour[0][1],oracleBracket.finalFour[1][0],oracleBracket.finalFour[1][1],oracleBracket.championship[0],oracleBracket.championship[1]];
   }
 
+  /**
+   * Get the current score of the user
+   * param  address user  - address of the user
+   * return uint8         - score so far, as compared to the oracle
+   *                           (0 if the user doesn't have a bracket)
+   */
   function getCurrentScore(address user) public constant returns (uint8) {
-    uint8 score = getQuarterScore(user);
-    if (userBrackets[user].started) { score += 1; }
-    score += getFinalScores(user);
-    return score;
-  }
-
-  function getQuarterScore(address user) public constant returns (uint8) {
     uint8 score = 0;
+    if (userBrackets[user].started) { score += 1; }
     for (uint i=0; i<14; i++) {
       if (oracleBracket.south[i] > 0 && userBrackets[user].south[i] == oracleBracket.south[i]) { score += 1; }
       if (oracleBracket.west[i] > 0 && userBrackets[user].west[i] == oracleBracket.west[i]) { score += 1; }
       if (oracleBracket.east[i] > 0 && userBrackets[user].east[i] == oracleBracket.east[i]) { score += 1; }
       if (oracleBracket.midwest[i] > 0 && userBrackets[user].midwest[i] == oracleBracket.midwest[i]) { score += 1; }
-    }
-    return score;
-  }
 
-  function getFinalScores(address user) public constant returns (uint8) {
-    uint8 score = 0;
-    for (uint i=0; i<2; i++) {
-      // Add final four scores (worth 2 points for correct prediction)
-      if (oracleBracket.finalFour[0][i] > 0
+      if (
+        i < 2
+        && oracleBracket.finalFour[0][i] > 0
         && userBrackets[user].finalFour[i][0] == oracleBracket.finalFour[i][0]
         && userBrackets[user].finalFour[i][1] == oracleBracket.finalFour[i][1]
-      ) {
-        score += 2;
-      }
+      ) { score += 2; }
+
+      // Championship prediction is worth 4 points
+      if (
+        i == 0
+        && userBrackets[user].championship[0] == oracleBracket.championship[0]
+        && oracleBracket.championship[0] > 0
+        && userBrackets[user].championship[1] == oracleBracket.championship[1]
+        && oracleBracket.championship[1] > 0
+      ) { score += 4; }
     }
-    // Championship prediction is worth 4 points
-    if (
-      userBrackets[user].championship[0] == oracleBracket.championship[0]
-      && oracleBracket.championship[0] > 0
-      && userBrackets[user].championship[1] == oracleBracket.championship[1]
-      && oracleBracket.championship[1] > 0
-    ) {
-      score += 4;
-    }
+
     return score;
   }
 
