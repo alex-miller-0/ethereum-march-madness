@@ -2,7 +2,7 @@
 
 **Technical Warning**: This process requires some working technical understanding of Ethereum. If you don't have that, this may be a good opportunity to learn! If you can't get something to work, feel free to open up an issue in this repo and I will try to give you some assistance if I have time.
 
-### Contract address:
+## Contract address: 0x2dcbe558103caa847d5580604272321284cc312a
 
 ### Updates
 **3/12 9AM PST: Contract deployed! Brackets closing at 11:00 AM EST on Thursday, March 16**
@@ -95,11 +95,12 @@ That hex string at the bottom is what you will need to copy and paste into your 
 
 If you're using My Ether Wallet:
 
-1. Copy the `data` parameter provided to you in the previous step and go to `Send Ether & Tokens`.
-2. In the `Amount to send` field, put `0.5ETH`.
-3. In the `gasLimit` put `2000000` (it shouldn't use this much and the remainder will be refunded).
-4. Click `Advanced: Add Data` and paste the `data` parameter from before.
-5. Send the transaction!
+1. Go to `Send Ether & Tokens`
+2. Set the `To Address` field to `0x2dcbe558103caa847d5580604272321284cc312a`
+3. In the `Amount to send` field, put `0.5ETH`.
+4. In the `gasLimit` put `2000000` (it shouldn't use this much and the remainder will be refunded).
+5. Click `Advanced: Add Data` and paste the hex string from before into the `Data` field.
+6. Sign and send the transaction!
 
 ### Sending your Ethereum transaction locally
 
@@ -107,7 +108,7 @@ If you have a node running locally, you can do cURL requests:
 
 ```
 curl --data '{"method":"personal_unlockAccount","params":["<your address>","<your password>",null],"id":1,"jsonrpc":"2.0"}' -H "Content-Type: application/json" -X POST localhost:8545
-curl --data '{"jsonrpc":"2.0","method":"eth_sendTransaction","params":[{"to":"<contract address>","gas":"0x1E8480","value":"0x6F05B59D3B20000","from": "<your address>","data":"<string you got>"}],"id":1}'  -H "Content-Type: application/json" -X POST localhost:8545
+curl --data '{"jsonrpc":"2.0","method":"eth_sendTransaction","params":[{"to":"0x2dcbe558103caa847d5580604272321284cc312a","gas":"0x1E8480","value":"0x6F05B59D3B20000","from": "<your address>","data":"<string you got>"}],"id":1}'  -H "Content-Type: application/json" -X POST localhost:8545
 ```
 
 You have now created your bracket!
@@ -117,7 +118,7 @@ You have now created your bracket!
 Once the tournament starts, you can check your score by opening up a web3 console and doing the following:
 
 ```
-var addr = "<contract address>";
+var addr = "0x2dcbe558103caa847d5580604272321284cc312a";
 var contract = web3.eth.contract([{"constant":false,"inputs":[],"name":"setAbort","outputs":[{"name":"","type":"bool"}],"payable":false,"type":"function"},{"constant":true,"inputs":[],"name":"pool","outputs":[{"name":"","type":"uint256"}],"payable":false,"type":"function"},{"constant":false,"inputs":[],"name":"abort","outputs":[{"name":"","type":"bool"}],"payable":false,"type":"function"},{"constant":true,"inputs":[{"name":"user","type":"address"}],"name":"getQuarterScore","outputs":[{"name":"","type":"uint8"}],"payable":false,"type":"function"},{"constant":false,"inputs":[{"name":"south","type":"uint8[15]"},{"name":"west","type":"uint8[15]"},{"name":"east","type":"uint8[15]"},{"name":"midwest","type":"uint8[15]"},{"name":"finalFour","type":"uint8[4]"},{"name":"championship","type":"uint8[2]"}],"name":"setBracket","outputs":[{"name":"","type":"bool"}],"payable":true,"type":"function"},{"constant":false,"inputs":[],"name":"issueWinner","outputs":[{"name":"","type":"bool"}],"payable":false,"type":"function"},{"constant":true,"inputs":[],"name":"leadingScore","outputs":[{"name":"","type":"uint8"}],"payable":false,"type":"function"},{"constant":true,"inputs":[{"name":"","type":"uint256"}],"name":"leaders","outputs":[{"name":"","type":"address"}],"payable":false,"type":"function"},{"constant":true,"inputs":[{"name":"user","type":"address"}],"name":"getCurrentScore","outputs":[{"name":"","type":"uint8"}],"payable":false,"type":"function"},{"constant":true,"inputs":[],"name":"ABORTED","outputs":[{"name":"","type":"bool"}],"payable":false,"type":"function"},{"constant":false,"inputs":[],"name":"scoreBracket","outputs":[{"name":"","type":"bool"}],"payable":false,"type":"function"},{"constant":true,"inputs":[{"name":"user","type":"address"}],"name":"getFinalScores","outputs":[{"name":"","type":"uint8"}],"payable":false,"type":"function"},{"inputs":[],"payable":false,"type":"constructor"}])
 var instance = contract.at(addr)
 
@@ -153,7 +154,7 @@ If you're using My Ether Wallet:
 1. Go to `Send Ether & Tokens`.
 2. In the `Amount to send` field, put `0`.
 3. In the `gasLimit` put `2000000` (it shouldn't use this much and the remainder will be refunded).
-4. Click `Advanced: Add Data` and use `0xdc26824f` for the `data` parameter.
+4. Click `Advanced: Add Data` and use `0xdc26824f` for the `Data` parameter.
 5. Send the transaction!
 
 ### Using a local node:
@@ -161,10 +162,10 @@ If you're using My Ether Wallet:
 If you have a node running locally:
 
 ```
-curl --data '{"jsonrpc":"2.0","method":"eth_sendTransaction","params":[{"to":"<contract address>","gas":"0x1E8480","from": "<your address>","data":"0xdc26824f"}],"id":1}'  -H "Content-Type: application/json" -X POST localhost:8545
+curl --data '{"jsonrpc":"2.0","method":"eth_sendTransaction","params":[{"to":"0x2dcbe558103caa847d5580604272321284cc312a","gas":"0x1E8480","from": "<your address>","data":"0xdc26824f"}],"id":1}'  -H "Content-Type: application/json" -X POST localhost:8545
 ```
 
-## Ending the pool
+## Declaring a winner
 
 After the 72 hour submission period, I will call the `issueWinner()` function, which will send all funds to the winner(s) of the bracket pool. I will subsequently announce the winner and the winnings on Reddit.
 
