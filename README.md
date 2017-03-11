@@ -1,15 +1,15 @@
 # March Madness (on Ethereum)
 
-**Technical Warning**: This process requires some working technical understanding of Ethereum. If you don't have that, this may be a good opportunity to learn! If you can't get something to work, feel free to open up an issue in this repo and I will try to give you some assistance if I have time.
+### Contract address: 0x2dcbe558103caa847d5580604272321284cc312a
 
-## Contract address: 0x2dcbe558103caa847d5580604272321284cc312a
+*Technical Warning: This process requires some working technical understanding of Ethereum. If you don't have that, this may be a good opportunity to learn! If you can't get something to work, feel free to open up an issue in this repo and I will try to give you some assistance if I have time.*
 
-### Updates
-**3/12 9AM PST: Contract deployed! Brackets closing at 11:00 AM EST on Thursday, March 16**
-
-Welcome to March, my favorite month! I love this month because here in America we host the best sports tournament on the planet - the [NCAA Basketball Tournament](https://en.wikipedia.org/wiki/NCAA_Division_I_Men's_Basketball_Tournament) (a.k.a. March Madness).
+## Updates
+**3/12 9AM PST:** Contract deployed! Submit a bracket before 11:00 AM EST on Thursday, March 16!
 
 ## Background
+
+Welcome to March, my favorite month! I love this month because here in America we host the best sports tournament on the planet - the [NCAA Basketball Tournament](https://en.wikipedia.org/wiki/NCAA_Division_I_Men's_Basketball_Tournament) (a.k.a. March Madness).
 
 64 college basketball teams from all across America go head-to-head in a single-elimination fight to the top. Well, technically there are 68 teams, but I'll get into that later.
 
@@ -45,7 +45,9 @@ Shortly after the tournament ends (give me ~15 min to update the oracle), you wi
 
 And before you ask, yes I know that you need to trust me to be an arbiter of the truth. If you're uncomfortable with that, you are welcome to re-deploy this contract and start your own pool.
 
-*NOTE: I have built an escape hatch so if something goes wrong, I will notify everyone with instructions on how to withdraw your 0.5 ETH. Sorry in advance if that happens.*
+### What if something goes wrong?
+
+I have built an escape hatch so if something goes wrong, I will notify everyone with instructions on how to withdraw your 0.5 ETH. Sorry in advance if that happens.
 
 ### Fees
 
@@ -113,7 +115,7 @@ curl --data '{"jsonrpc":"2.0","method":"eth_sendTransaction","params":[{"to":"0x
 
 You have now created your bracket!
 
-## During the tournament: Checking your score
+## During the tournament: Checking your score (optional)
 
 Once the tournament starts, you can check your score by opening up a web3 console and doing the following:
 
@@ -123,13 +125,7 @@ var contract = web3.eth.contract([{"constant":false,"inputs":[],"name":"setAbort
 var instance = contract.at(addr)
 
 // Check your score
-instance.getScore(<your address>)
-
-// Check the highest score
-instance.leadingScore()
-
-// Get the leader(s)
-instance.leaders()
+instance.getCurrentScore(<your address>)
 
 // Get the total pool (in wei)
 instance.pool()
@@ -164,6 +160,23 @@ If you have a node running locally:
 ```
 curl --data '{"jsonrpc":"2.0","method":"eth_sendTransaction","params":[{"to":"0x2dcbe558103caa847d5580604272321284cc312a","gas":"0x1E8480","from": "<your address>","data":"0xdc26824f"}],"id":1}'  -H "Content-Type: application/json" -X POST localhost:8545
 ```
+
+## Before a winner is declared (optional)
+
+While you wait for the 72 hour window to pass, you can check the top scores using a web3 console:
+
+```
+var addr = "0x2dcbe558103caa847d5580604272321284cc312a";
+var contract = web3.eth.contract([{"constant":false,"inputs":[],"name":"setAbort","outputs":[{"name":"","type":"bool"}],"payable":false,"type":"function"},{"constant":true,"inputs":[],"name":"pool","outputs":[{"name":"","type":"uint256"}],"payable":false,"type":"function"},{"constant":false,"inputs":[],"name":"abort","outputs":[{"name":"","type":"bool"}],"payable":false,"type":"function"},{"constant":true,"inputs":[{"name":"user","type":"address"}],"name":"getQuarterScore","outputs":[{"name":"","type":"uint8"}],"payable":false,"type":"function"},{"constant":false,"inputs":[{"name":"south","type":"uint8[15]"},{"name":"west","type":"uint8[15]"},{"name":"east","type":"uint8[15]"},{"name":"midwest","type":"uint8[15]"},{"name":"finalFour","type":"uint8[4]"},{"name":"championship","type":"uint8[2]"}],"name":"setBracket","outputs":[{"name":"","type":"bool"}],"payable":true,"type":"function"},{"constant":false,"inputs":[],"name":"issueWinner","outputs":[{"name":"","type":"bool"}],"payable":false,"type":"function"},{"constant":true,"inputs":[],"name":"leadingScore","outputs":[{"name":"","type":"uint8"}],"payable":false,"type":"function"},{"constant":true,"inputs":[{"name":"","type":"uint256"}],"name":"leaders","outputs":[{"name":"","type":"address"}],"payable":false,"type":"function"},{"constant":true,"inputs":[{"name":"user","type":"address"}],"name":"getCurrentScore","outputs":[{"name":"","type":"uint8"}],"payable":false,"type":"function"},{"constant":true,"inputs":[],"name":"ABORTED","outputs":[{"name":"","type":"bool"}],"payable":false,"type":"function"},{"constant":false,"inputs":[],"name":"scoreBracket","outputs":[{"name":"","type":"bool"}],"payable":false,"type":"function"},{"constant":true,"inputs":[{"name":"user","type":"address"}],"name":"getFinalScores","outputs":[{"name":"","type":"uint8"}],"payable":false,"type":"function"},{"inputs":[],"payable":false,"type":"constructor"}])
+var instance = contract.at(addr)
+
+// Get the leader(s) (hopefully this shows your address!)
+instance.leaders()
+
+// Check the highest score
+instance.leadingScore()
+```
+
 
 ## Declaring a winner
 
