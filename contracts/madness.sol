@@ -150,6 +150,7 @@ contract Madness {
   // If something went wrong, users can withdraw their funds here
   function withdraw() public returns (bool) {
     if (ABORTED && userBrackets[msg.sender].started) {
+      userBrackets[msg.sender].started = false;
       if (!msg.sender.send(COST)) { throw; }
     }
     return true;

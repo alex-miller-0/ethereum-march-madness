@@ -2,7 +2,7 @@
 
 **Technical Warning**: This process requires some working technical understanding of Ethereum. If you don't have that, this may be a good opportunity to learn! If you can't get something to work, feel free to open up an issue in this repo and I will try to give you some assistance if I have time.
 
-## Contract address: 0x2dcbe558103caa847d5580604272321284cc312a
+## Contract address: 0x9c9C68043519276AB55364a1771C002DC7051f99
 
 ### Updates
 **3/12 9AM PST: Contract deployed! Brackets closing at 11:00 AM EST on Thursday, March 16**
@@ -13,7 +13,7 @@ Welcome to March, my favorite month! I love this month because here in America w
 
 64 college basketball teams from all across America go head-to-head in a single-elimination fight to the top. Well, technically there are 68 teams, but I'll get into that later.
 
-The week before the tournament starts, it is customary here in America to fill out brackets with your predictions of who will win each game. It's a lot of picks (59 games) and the probability of guessing every game correctly is almost zero (there are upsets every year). Within a bracket pool (usually comprised of your friends and family), the person who picks the most winners is crowned the champion. There are many strategies ranging from picking your favorite teams to always picking the highest seed (usually a bad idea in big pools) to consulting a [probability distribution](http://bracketodds.cs.illinois.edu/2015%20Omega.pdf). Which is the best strategy? Who knows.
+The week before the tournament starts, it is customary here in America to fill out brackets with your predictions of who will win each game. It's a lot of picks (59 games) and the probability of guessing every game correctly is [1 in 2.4 trillion](http://ftw.usatoday.com/2015/03/duke-math-professor-says-odds-of-a-perfect-bracket-are-one-in-2-4-trillion). Within a bracket pool (usually comprised of your friends and family), the person who picks the most winners is crowned the champion. There are many strategies ranging from picking your favorite teams to always picking the highest seed (usually a bad idea in big pools) to consulting a [probability distribution](http://bracketodds.cs.illinois.edu/2015%20Omega.pdf). Which is the best strategy? Who knows.
 
 As a huge [Arizona basketball](http://www.arizonawildcats.com/schedule.aspx?schedule=368) fan I thought it would be fun to put my Ethereum skills to the test and deploy a bracket pool to the Ethereum network.
 
@@ -31,7 +31,7 @@ You will fill out a bracket and submit this to the blockchain along with the buy
 
 Points are allocated as follows:
 * 1 point for submitting a braket
-* 1 point for each correctly chosen team in round of 64, 32, and sweet 16
+* 1 point for each correctly chosen team in round of 64, 32, sweet 16, and elite 8
 * 2 points for each correctly chosen team in the final four
 * 4 points for the correctly chosen champion
 
@@ -96,7 +96,7 @@ That hex string at the bottom is what you will need to copy and paste into your 
 If you're using My Ether Wallet:
 
 1. Go to `Send Ether & Tokens`
-2. Set the `To Address` field to `0x2dcbe558103caa847d5580604272321284cc312a`
+2. Set the `To Address` field to `0x9c9C68043519276AB55364a1771C002DC7051f99`
 3. In the `Amount to send` field, put `0.5ETH`.
 4. In the `gasLimit` put `2000000` (it shouldn't use this much and the remainder will be refunded).
 5. Click `Advanced: Add Data` and paste the hex string from before into the `Data` field.
@@ -108,7 +108,7 @@ If you have a node running locally, you can do cURL requests:
 
 ```
 curl --data '{"method":"personal_unlockAccount","params":["<your address>","<your password>",null],"id":1,"jsonrpc":"2.0"}' -H "Content-Type: application/json" -X POST localhost:8545
-curl --data '{"jsonrpc":"2.0","method":"eth_sendTransaction","params":[{"to":"0x2dcbe558103caa847d5580604272321284cc312a","gas":"0x1E8480","value":"0x6F05B59D3B20000","from": "<your address>","data":"<string you got>"}],"id":1}'  -H "Content-Type: application/json" -X POST localhost:8545
+curl --data '{"jsonrpc":"2.0","method":"eth_sendTransaction","params":[{"to":"0x9c9C68043519276AB55364a1771C002DC7051f99","gas":"0x1E8480","value":"0x6F05B59D3B20000","from": "<your address>","data":"<string you got>"}],"id":1}'  -H "Content-Type: application/json" -X POST localhost:8545
 ```
 
 You have now created your bracket!
@@ -118,7 +118,7 @@ You have now created your bracket!
 Once the tournament starts, you can check your score by opening up a web3 console and doing the following:
 
 ```
-var addr = "0x2dcbe558103caa847d5580604272321284cc312a";
+var addr = "0x9c9C68043519276AB55364a1771C002DC7051f99";
 var contract = web3.eth.contract([{"constant":false,"inputs":[],"name":"setAbort","outputs":[{"name":"","type":"bool"}],"payable":false,"type":"function"},{"constant":true,"inputs":[],"name":"pool","outputs":[{"name":"","type":"uint256"}],"payable":false,"type":"function"},{"constant":false,"inputs":[],"name":"abort","outputs":[{"name":"","type":"bool"}],"payable":false,"type":"function"},{"constant":true,"inputs":[{"name":"user","type":"address"}],"name":"getQuarterScore","outputs":[{"name":"","type":"uint8"}],"payable":false,"type":"function"},{"constant":false,"inputs":[{"name":"south","type":"uint8[15]"},{"name":"west","type":"uint8[15]"},{"name":"east","type":"uint8[15]"},{"name":"midwest","type":"uint8[15]"},{"name":"finalFour","type":"uint8[4]"},{"name":"championship","type":"uint8[2]"}],"name":"setBracket","outputs":[{"name":"","type":"bool"}],"payable":true,"type":"function"},{"constant":false,"inputs":[],"name":"issueWinner","outputs":[{"name":"","type":"bool"}],"payable":false,"type":"function"},{"constant":true,"inputs":[],"name":"leadingScore","outputs":[{"name":"","type":"uint8"}],"payable":false,"type":"function"},{"constant":true,"inputs":[{"name":"","type":"uint256"}],"name":"leaders","outputs":[{"name":"","type":"address"}],"payable":false,"type":"function"},{"constant":true,"inputs":[{"name":"user","type":"address"}],"name":"getCurrentScore","outputs":[{"name":"","type":"uint8"}],"payable":false,"type":"function"},{"constant":true,"inputs":[],"name":"ABORTED","outputs":[{"name":"","type":"bool"}],"payable":false,"type":"function"},{"constant":false,"inputs":[],"name":"scoreBracket","outputs":[{"name":"","type":"bool"}],"payable":false,"type":"function"},{"constant":true,"inputs":[{"name":"user","type":"address"}],"name":"getFinalScores","outputs":[{"name":"","type":"uint8"}],"payable":false,"type":"function"},{"inputs":[],"payable":false,"type":"constructor"}])
 var instance = contract.at(addr)
 
@@ -162,7 +162,7 @@ If you're using My Ether Wallet:
 If you have a node running locally:
 
 ```
-curl --data '{"jsonrpc":"2.0","method":"eth_sendTransaction","params":[{"to":"0x2dcbe558103caa847d5580604272321284cc312a","gas":"0x1E8480","from": "<your address>","data":"0xdc26824f"}],"id":1}'  -H "Content-Type: application/json" -X POST localhost:8545
+curl --data '{"jsonrpc":"2.0","method":"eth_sendTransaction","params":[{"to":"0x9c9C68043519276AB55364a1771C002DC7051f99","gas":"0x1E8480","from": "<your address>","data":"0xdc26824f"}],"id":1}'  -H "Content-Type: application/json" -X POST localhost:8545
 ```
 
 ## Declaring a winner
