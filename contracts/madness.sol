@@ -56,10 +56,10 @@ contract Madness {
 
   /**
    * Setup a bracket!
-   * param uint8[14] south - picks in south quarter
-   * param uint8[14] west - picks in west quarter
-   * param uint8[14] east - picks in east quarter
-   * param uint8[14] midwest - picks in midwest quarter
+   * param uint8[15] south - picks in south quarter
+   * param uint8[15] west - picks in west quarter
+   * param uint8[15] east - picks in east quarter
+   * param uint8[15] midwest - picks in midwest quarter
    * param uint8[4]  final_four - picks for final Four [[region, seed], ]
    * param uint8[2]  championship - picks for champ [region, seed]
 
@@ -169,9 +169,9 @@ contract Madness {
    * Get a user's bracket for a given region
    * param  address user - address of the user in question (can be anyone)
    * param  uint    region  - 1=south, 2=west, 3=east, 4=midwest
-   * return uint8[14]       - the user's 15 winners for the quarter bracket
+   * return uint8[15]       - the user's 15 winners for the quarter bracket
    */
-  function getQuarter(address user, uint8 region) public constant returns (uint8[14]) {
+  function getQuarter(address user, uint8 region) public constant returns (uint8[15]) {
     if (region == 1) {
       return userBrackets[user].south;
     } else if (region == 2) {
@@ -205,9 +205,9 @@ contract Madness {
   /**
    * Get the oracle's bracket for a given region
    * param  uint8    region  - 1=south, 2=west, 3=east, 4=midwest
-   * return uint8[14]       - the user's 15 winners for the quarter bracket
+   * return uint8[15]       - the user's 15 winners for the quarter bracket
    */
-  function getOracleQuarter(uint8 region) public constant returns (uint8[14]) {
+  function getOracleQuarter(uint8 region) public constant returns (uint8[15]) {
     if (region == 1) {
       return oracleBracket.south;
     } else if (region == 2) {
