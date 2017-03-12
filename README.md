@@ -3,7 +3,6 @@
 ## Contract address: 0x9c9C68043519276AB55364a1771C002DC7051f99
 
 *Technical Warning: This process requires some working technical understanding of Ethereum. If you don't have that, this may be a good opportunity to learn! If you can't get something to work, feel free to open up an issue in this repo and I will try to give you some assistance if I have time.*
->>>>>>> 5a36098061c14ed2b9c9179621a15a6b2f9501e0
 
 ## Updates
 **3/12 9AM PST:** Contract deployed! Submit a bracket before 11:00 AM EST on Thursday, March 16!
@@ -66,7 +65,7 @@ git clone https://github.com/alex-miller-0/ethereum-march-madness.git
 
 It's probably a good idea to fill out a bracket visually first. You can find one [here](http://www.ncaa.com/news/basketball-men/bracket-beat/march-madness-printable-ncaa-tournament-bracket) or [here](http://www.cbssports.com/college-basketball/ncaa-tournament/brackets/games/). You will only need this for reference later.
 
-I guess I should address the issue of there being 68 teams. For some reason, the tournament has the 4 weakest teams each play an extra game ahead of the tournament to vie for a 16 seed (the worst seed). The following day, the two winning teams must face the top 2 teams in the tournament (both 1 seeds). Historically, no 16 seed has ever beaten a 1 seed, so I'm going to neglect these extra 4 teams and mark them simply as 16 seeds (i.e. whoever wins a spot in the round of 64). *Hint: you might want to pick the 1 seed for these matchups.*
+I guess I should address the issue of there being 68 teams. For some reason, the NCAA tournament has the 4 weakest teams each play an extra game ahead of the tournament to vie for a 16 seed (the worst seed). Also, 4 "bubble" teams play for the 11 seed. Anyway, it's not important. What I'm going to do is let you pick either one of the extra teams to advance (basically treat them as a package). It will make more sense when you fill out the bracket.
 
 ### Transcribe your picks into this command line tool
 
@@ -78,7 +77,9 @@ python cli.py
 
 If you run into problems, make sure you have [python installed](http://docs.python-guide.org/en/latest/starting/installation/) along with the following packages: `pysha3, glob, pickle` (the latter 2 should come with your python installation). To install a python package, make sure you have [pip](https://pip.pypa.io/en/stable/installing/) installed and run `pip install <packagename>` (you may need to include `sudo` at the front if that doesn't work).
 
-Once the program in running, it will ask you for your picks for all 59 games. After you're done with that, you will see something like the following:
+Once the program in running, it will ask you for your picks for all 59 games. If at any time you want to reset your bracket, close out of the program (control+C) and restart. If it asks you to use an old bracket, say no.
+
+After you're done with your bracket, you will see something like the following:
 
 ```
 Cool. You've made your picks. Now we need to put it on the blockchain.
