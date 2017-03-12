@@ -9,9 +9,9 @@ TEAMS = {
         "7": "Dayton",
         "8": "Arkansas",
         "9": "Seton Hall",
-        "10": "Wichita St.", // pick
+        "10": "Wichita St.",
         "11": "Kansas St. or Wake Forest",
-        "12": "Middle Tennessee", // pick this one
+        "12": "Middle Tennessee",
         "13": "Winthrop",
         "14": "Kent St.",
         "15": "Northern Kentucky",
