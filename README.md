@@ -1,8 +1,8 @@
 # March Madness (on Ethereum)
-
+## still testing - not ready for public consumption
 ## Contract address: 0x9c9C68043519276AB55364a1771C002DC7051f99
 
-*Technical Warning: This process requires some working technical understanding of Ethereum. If you don't have that, this may be a good opportunity to learn! If you can't get something to work, feel free to open up an issue in this repo and I will try to give you some assistance if I have time.*
+**WARNING: This is not-even-beta software. USE AT YOUR OWN RISK and make sure you know what you are doing.**
 
 ## Updates
 **3/12 9AM PST:** Contract deployed! Submit a bracket before 11:00 AM EST on Thursday, March 16!
@@ -47,7 +47,7 @@ And before you ask, yes I know that you need to trust me to be an arbiter of the
 
 ### What if something goes wrong?
 
-I have built an escape hatch so if something goes wrong, I will notify everyone with instructions on how to withdraw your 0.5 ETH. Sorry in advance if that happens.
+I have built an escape hatch so if something goes wrong, I will notify everyone with instructions on how to withdraw your 0.5 ETH. (I've actually already used this after I deployed a borked contract earlier) Sorry in advance if that happens.
 
 ### Fees
 

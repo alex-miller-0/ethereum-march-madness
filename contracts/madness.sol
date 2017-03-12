@@ -12,10 +12,10 @@ contract Madness {
   // Within each bracket, games are defined starting from the round of 64 and going down.
   struct bracket {
     // There are four quarter brackets (East, West, North, South) in a fullBracket
-    uint8[14] south;
-    uint8[14] west;
-    uint8[14] east;
-    uint8[14] midwest;
+    uint8[15] south;
+    uint8[15] west;
+    uint8[15] east;
+    uint8[15] midwest;
 
     // Index is 0=South, 1=West, 2=East, 3=Midwest
     uint8[4] quarterBracketScore;
@@ -64,8 +64,8 @@ contract Madness {
    * param uint8[2]  championship - picks for champ [region, seed]
 
    */
-  function setBracket(uint8[14] south, uint8[14] west, uint8[14] east,
-  uint8[14] midwest, uint8[4] finalFour, uint8[2] championship) payable
+  function setBracket(uint8[15] south, uint8[15] west, uint8[15] east,
+  uint8[15] midwest, uint8[4] finalFour, uint8[2] championship) payable
   public returns (bool) {
 
     if (msg.sender == owner) {

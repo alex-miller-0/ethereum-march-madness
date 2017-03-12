@@ -2,7 +2,7 @@
 import sha3
 
 def getBracketTx(south, west, east, midwest, final_four, championship):
-    header = sha3.keccak_256('setBracket(uint8[14],uint8[14],uint8[14],uint8[14],uint8[4],uint8[2])')
+    header = sha3.keccak_256('setBracket(uint8[15],uint8[15],uint8[15],uint8[15],uint8[4],uint8[2])')
     data = header.hexdigest()[:8]
     print south
     print west
@@ -24,4 +24,14 @@ def getCheckTx(addr):
     header = sha3.keccak_256('getCurrentScore(address)')
     data = header.hexdigest()[:8]
     data += addr
+    return '0x' + data
+
+def getAbortTx():
+    header = sha3.keccak_256('abort()')
+    data = header.hexdigest()[:8]
+    return '0x' + data
+
+def getWithdrawTx():
+    header = sha3.keccak_256('withdraw()')
+    data = header.hexdigest()[:8]
     return '0x' + data
