@@ -34,7 +34,7 @@ Points are allocated as follows:
 * 2 points for each correctly chosen team in the final four
 * 4 points for the correctly chosen champion
 
-This means the highest possible score is 65.
+This means the highest possible score is 69.
 
 *NOTE: Each game is scored independently of others, so as long as you pick the winning team, it doesn't matter if you incorrectly picked their opponent.*
 
