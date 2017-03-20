@@ -4,6 +4,7 @@
 **WARNING: This is not-even-beta software. USE AT YOUR OWN RISK and make sure you know what you are doing.**
 
 ## Updates
+**3/19 10PM PST:** Oracle bracket updated after the round of 32. High score is 36, second place is 34, rest of the field is eliminated. Max possible score at this point is 48.
 **3/13 2PM PST:** Seems like a few people are having trouble running python. For those of you who are less tech-savvy, please [fill out a bracket](http://interactives.indystar.com/sports/NCAA_MBB_Bracket/), take a screenshot, and share on [the reddit post](https://www.reddit.com/r/ethereum/comments/5z5cct/come_fill_out_a_bracket_and_play_march_madness_on/). I will reply with a string for you to use in your transaction (you can use MEW).
 
 **3/12 9AM PST:** Contract deployed! Submit a bracket before 11:00 AM EST on Thursday, March 16!
